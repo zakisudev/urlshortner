@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const dns = require('dns');
-const { url } = require('inspector');
 const app = express();
 
 // Basic Configuration
