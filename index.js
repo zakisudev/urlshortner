@@ -26,22 +26,33 @@ app.get('/api/hello', function (req, res) {
 });
 
 // My code
-app.post('/api/shorturl', (req, res) => {
-  const { url } = req.body;
-  const urlRegex =
-    /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}/;
+let urlDatabase = [];
+let id = 1;
 
+app.post('/api/shorturl', (req, res) => {
+  let { url } = req.body;
+  let urlRegex = /^(http|https):\/\/www\.[a-z0-9]+\.[a-zA-Z0-9]/g;
   if (!urlRegex.test(url)) {
     res.json({ error: 'invalid url' });
   } else {
-    const urlObj = new URL(url);
-    dns.lookup(urlObj.hostname, (err) => {
+    dns.lookup(url.split('//')[1].split('/')[0], (err, address, family) => {
       if (err) {
         res.json({ error: 'invalid url' });
       } else {
-        res.json({ original_url: url, short_url: 1 });
+        urlDatabase.push({ original_url: url, short_url: id++ });
+        res.json({ original_url: url, short_url: id - 1 });
       }
     });
+  }
+});
+
+app.get('/api/shorturl/:id', (req, res) => {
+  let id = req.params.id;
+  let url = urlDatabase.find((url) => url.short_url === id);
+  if (!url) {
+    res.json({ error: 'No short URL found for the given input' });
+  } else {
+    res.redirect(url.original_url);
   }
 });
 
