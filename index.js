@@ -29,20 +29,18 @@ app.get('/api/hello', function (req, res) {
 let urlDatabase = [];
 let id = 1;
 
-app.post('/api/shorturl', (req, res) => {
-  let { url } = req.body;
-  let urlRegex = /^(http|https):\/\/www\.[a-z0-9]+\.[a-zA-Z0-9]/g;
+app.post('api/shorturl', (req, res) => {
+  let url = req.body.url;
+  let urlRegex = /^https?:\/\/www\.\w+\.\w+\/?$/;
   if (!urlRegex.test(url)) {
     res.json({ error: 'invalid url' });
   } else {
-    dns.lookup(url.split('//')[1].split('/')[0], (err, address, family) => {
-      if (err) {
-        res.json({ error: 'invalid url' });
-      } else {
-        urlDatabase.push({ original_url: url, short_url: id++ });
-        res.json({ original_url: url, short_url: id - 1 });
-      }
-    });
+    let urlObj = {
+      original_url: url,
+      short_url: id++,
+    };
+    urlDatabase.push(urlObj);
+    res.json(urlObj);
   }
 });
 
