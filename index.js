@@ -25,32 +25,33 @@ app.get('/api/hello', function (req, res) {
   res.json({ greeting: 'hello API' });
 });
 
-// My code
-let urlDatabase = [];
-let id = 1;
+// Url Shortener Microservice
+const urlDatabase = [];
+const urlRegex = /^https:\/\/www\.(.+)\.com$/;
 
-app.post('api/shorturl', (req, res) => {
-  let url = req.body.url;
-  let urlRegex = /^https?:\/\/www\.\w+\.\w+\/?$/;
-  if (!urlRegex.test(url)) {
+app.post('/api/shorturl', (req, res) => {
+  const { url } = req.body;
+  const urlMatch = url.match(urlRegex);
+  if (!urlMatch) {
     res.json({ error: 'invalid url' });
   } else {
-    let urlObj = {
+    const urlObj = {
       original_url: url,
-      short_url: id++,
+      short_url: urlDatabase.length,
     };
     urlDatabase.push(urlObj);
     res.json(urlObj);
   }
 });
 
-app.get('/api/shorturl/:id', (req, res) => {
-  let id = req.params.id;
-  let url = urlDatabase.find((url) => url.short_url === id);
-  if (!url) {
-    res.json({ error: 'No short URL found for the given input' });
+app.get('/api/shorturl/:short_url', (req, res) => {
+  const { short_url } = req.params;
+  const urlObj = urlDatabase[short_url];
+
+  if (!urlObj) {
+    res.json({ error: 'invalid url' });
   } else {
-    res.redirect(url.original_url);
+    res.redirect(urlObj.original_url);
   }
 });
 
