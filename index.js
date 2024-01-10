@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const dns = require('dns');
 const app = express();
 
 // Basic Configuration
@@ -27,7 +26,8 @@ app.get('/api/hello', function (req, res) {
 
 // Url Shortener Microservice
 const urlDatabase = [];
-const urlRegex = /^https:\/\/www\.(.+)\.com$/;
+const urlRegex =
+  /^(https?:\/\/)?(www\.)?([\w-]+)(\.[a-z]{2,8})(\.[a-z]{2,8})?(\.[a-z]{2,8})?/;
 
 app.post('/api/shorturl', (req, res) => {
   const { url } = req.body;
